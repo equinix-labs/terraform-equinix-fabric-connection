@@ -5,7 +5,7 @@
 
 `terraform-equinix-connection` is a minimal Terraform module that utilizes [Terraform provider for Equinix](https://registry.terraform.io/providers/equinix/equinix/latest) to set up an Equinix Fabric L2 connection.
 
-As part of Platform Equinix, your infrastructure can connect with other parties, such as public cloud providers, network service providers, or your own colocation cages in Equinix by defining an [Equinix Fabric - software-defined interconnection](https://docs.equinix.com/en-us/Content/Interconnection/Fabric/Fabric-landing-main.htm)
+As part of Platform Equinix, your infrastructure can connect with other parties, such as public cloud providers, network service providers, or your own colocation cages in Equinix by defining an [Equinix Fabric - software-defined interconnection](https://docs.equinix.com/en-us/Content/Interconnection/Fabric/Fabric-landing-main.htm).
 
 ```html
   Origin                                             Destination
@@ -19,7 +19,8 @@ As part of Platform Equinix, your infrastructure can connect with other parties,
 └────────────────┘                                 └────────────────────┘
 ```
 
-Setting Up an Equinix Fabric connection requires combine and configure several parameters depending on the origin and destination types. It also requires configuration on the platform of the service to which you are connecting, such as creating an Interconnect Attachment in Google Cloud platform, or approving a Direct Connect request in AWS. Although this module can be used directly, it is intended to be consumed by other service-specific modules to abstract you from this process and to include also all the necessary configuration on the target platform.
+> **NOTE:** 
+Setting Up an Equinix Fabric connection requires combine and configure several parameters depending on the origin and destination types. It also requires configuration in the platform of the service you are connecting to, such as creating an Interconnect Attachment in Google Cloud platform, or approving a Direct Connect request in AWS. Although this module can be used directly, it is intended to be consumed by other service-specific modules to abstract you from this process and to include also all the necessary configuration on the target platform.
 
 ### Usage
 
