@@ -18,19 +18,36 @@ data "equinix_ecx_port" "zside" {
 }
 
 locals  {
-  primary_name  = var.name != null ? var.name : upper(format("%s-%s-%s", split(" ", var.seller_profile_name)[0], var.seller_metro_code, random_string.this.result))
-  secondary_name = var.secondary_name != null ? var.secondary_name : format("%s-SEC", local.primary_name)
-  secondary_port_uuid = var.secondary_port_name != null ? data.equinix_ecx_port.secondary[0].id : null
+  primary_speed = var.speed == null ? [
+    for s in sort(formatlist("%03d", [
+      for band in data.equinix_ecx_l2_sellerprofile.seller.speed_band : band.speed
+    ])) : tonumber(s)
+  ][0] : var.speed
+
+  primary_speed_unit = var.speed_unit == null ? [
+    for band in data.equinix_ecx_l2_sellerprofile.seller.speed_band : band.speed_unit
+    if band.speed == local.primary_speed
+  ][0] : var.speed_unit
 
   primary_seller_metro_code = var.seller_metro_name != null ? [
-       for metro in data.equinix_ecx_l2_sellerprofile_seller.metro : metro.regions[0]
-       if metro.name == title(var.seller_metro_name)
+    for metro in data.equinix_ecx_l2_sellerprofile.seller.metro : metro.code
+    if metro.name == title(var.seller_metro_name)
    ][0] : var.seller_metro_code
 
+  primary_region = var.seller_region == null ? [
+    for metro in data.equinix_ecx_l2_sellerprofile.seller.metro : keys(metro.regions)[0]
+    if metro.code == local.primary_seller_metro_code
+  ][0] : var.seller_region
+
+  primary_name  = var.name != null ? var.name : upper(format("%s-%s-%s", split(" ", coalesce(var.seller_profile_name, var.zside_port_name))[0], local.primary_seller_metro_code, random_string.this.result))
+
   secondary_seller_metro_code = var.secondary_seller_metro_name != null ? [
-       for metro in data.equinix_ecx_l2_sellerprofile.seller.metro : metro.regions[0]
-       if metro.name == title(var.secondary_seller_metro_name)
-   ][0] : var.secondary_seller_metro_code
+    for metro in data.equinix_ecx_l2_sellerprofile.seller.metro : metro.code
+    if metro.name == title(var.secondary_seller_metro_name)
+  ][0] : var.secondary_seller_metro_code
+
+  secondary_name = var.secondary_name != null ? var.secondary_name : format("%s-SEC", local.primary_name)
+  secondary_port_uuid = var.secondary_port_name != null ? data.equinix_ecx_port.secondary[0].id : null
 }
 
 resource "random_string" "this" {
@@ -40,13 +57,13 @@ resource "random_string" "this" {
 
 resource "equinix_ecx_l2_connection" "this" {
   name                  = var.secondary_name != null ? format("%s-PRI", local.primary_name) : local.primary_name
-  profile_uuid          = data.equinix_ecx_l2_sellerprofile.this.uuid
-  speed                 = var.speed != null ? var.speed : data.equinix_ecx_l2_sellerprofile.seller.speed_band.0.speed
-  speed_unit            = var.speed_unit != null ? var.speed_unit : data.equinix_ecx_l2_sellerprofile.seller.speed_band.0.speed_unit
+  profile_uuid          = data.equinix_ecx_l2_sellerprofile.seller.uuid
+  speed                 = local.primary_speed
+  speed_unit            = local.primary_speed_unit
   notifications         = var.notification_users
   purchase_order_number = var.purcharse_order_number
   seller_metro_code     = local.primary_seller_metro_code
-  seller_region         = var.seller_region != null ? var.seller_region : data.equinix_ecx_l2_sellerprofile.seller.metro.0.regions[0]
+  seller_region         = local.primary_region
   authorization_key     = var.seller_authorization_key
   service_token         = var.service_token_id
   port_uuid             = var.port_name != null ? data.equinix_ecx_port.primary[0].id : null
@@ -60,7 +77,7 @@ resource "equinix_ecx_l2_connection" "this" {
   zside_vlan_ctag       = var.zside_vlan_ctag
   
   dynamic "secondary_connection" {
-    for_each = var.redundancy == "redundant" ? [1] : []
+    for_each = var.redundancy_type == "redundant" ? [1] : []
     content {
         name                = local.secondary_name
         speed               = var.secondary_speed

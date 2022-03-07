@@ -1,6 +1,6 @@
 variable "seller_profile_name" {
   type        = string
-  description = "Unique identifier of the service provider's profile."
+  description = "Unique identifier of the service provider's profile. One of 'seller_profile_name' or 'zside_port_name' is required."
   default     = null
 }
 
@@ -35,9 +35,9 @@ variable "speed_unit" {
 
   validation {
     condition = (
-      var.speed_unit == null || contains(["GB", "MB"], var.speed_unit)
+      var.speed_unit == null ? true : contains(["GB", "MB"], var.speed_unit)
     )
-    error_message = "Valid values for 'speed_unit' are (MB, GB)"
+    error_message = "Valid values for 'speed_unit' are (MB, GB)."
   } 
 }
 
@@ -60,7 +60,7 @@ variable "seller_metro_code" {
 
   validation {
     condition = ( 
-      var.seller_metro_code == null || can(regex("^[A-Z]{2}$", var.seller_metro_code))
+      var.seller_metro_code == null ? true : can(regex("^[A-Z]{2}$", var.seller_metro_code))
     )
     error_message = "Valid metro code consits of two capital leters, i.e. 'FR', 'SV', 'DC'."
   }
@@ -118,7 +118,7 @@ variable "vlan_ctag" {
 }
 
 variable "zside_port_name" {
-  type        = number
+  type        = string
   description = <<EOF
   Name of the buyer's port from which the connection would originate the port on the remote side (z-side). Required
   when destination is another port instead of a service profile. Usually, if you don't have an existing private service
@@ -220,17 +220,17 @@ variable "secondary_speed" {
 
 variable "secondary_speed_unit" {
   type        = string
-  description = "Unit of the speed/bandwidth to be allocated to the secondary connection."
+  description = <<EOF
+  Unit of the speed/bandwidth to be allocated to the secondary connection. If not specified then primary connection
+  speed unit will be used.
+  EOF
   default     = null
 
   validation {
     condition = (
-      var.secondary_speed_unit == null || contains(["GB", "MB"], var.secondary_speed_unit)
+      var.secondary_speed_unit == null ? true : contains(["GB", "MB"], var.secondary_speed_unit)
     )
-    error_message = <<EOF
-    Valid values for 'secondary_speed_unit' are (MB, GB). If not specified then primary connection speed unit will
-    be used.
-    EOF
+    error_message = "Valid values for 'secondary_speed_unit' are (MB, GB)."
   } 
 }
 
@@ -268,7 +268,7 @@ variable "secondary_seller_metro_code" {
 
   validation {
     condition = ( 
-      var.secondary_seller_metro_code == null || can(regex("^[A-Z]{2}$", var.secondary_seller_metro_code))
+      var.secondary_seller_metro_code == null ? true : can(regex("^[A-Z]{2}$", var.secondary_seller_metro_code))
     )
     error_message = "Valid metro code consits of two capital leters, i.e. 'FR', 'SV', 'DC'."
   }
