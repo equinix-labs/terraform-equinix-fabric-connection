@@ -5,7 +5,7 @@
 
 `terraform-equinix-connection` is a minimal Terraform module that utilizes [Terraform provider for Equinix](https://registry.terraform.io/providers/equinix/equinix/latest) to set up an Equinix Fabric L2 connection.
 
-A part of Platform Equinix, your infrastructure can connect with other parties, such as public cloud providers, network service providers, or your own colocation cages in Equinix by defining an [Equinix Fabric - software-defined interconnections](https://docs.equinix.com/en-us/Content/Interconnection/Fabric/Fabric-landing-main.htm)
+As part of Platform Equinix, your infrastructure can connect with other parties, such as public cloud providers, network service providers, or your own colocation cages in Equinix by defining an [Equinix Fabric - software-defined interconnections](https://docs.equinix.com/en-us/Content/Interconnection/Fabric/Fabric-landing-main.htm)
 
 ```html
   Origin                                             Destination
