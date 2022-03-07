@@ -1,13 +1,13 @@
 variable "seller_profile_name" {
   type        = string
   description = "Unique identifier of the service provider's profile. One of 'seller_profile_name' or 'zside_port_name' is required."
-  default     = null
+  default     = ""
 }
 
 variable "name" {
   type        = string
   description = "Name of the connection resource that will be created. It will be auto-generated if not specified."
-  default     = null
+  default     = ""
 }
 
 variable "port_name" {
@@ -16,7 +16,7 @@ variable "port_name" {
   Name of the buyer's port from which the connection would originate. One of 'port_name',
   'network_edge_id' or 'service_token_id' is required.
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "speed" {
@@ -25,17 +25,17 @@ variable "speed" {
   Speed/Bandwidth to be allocated to the connection - (MB or GB). If not specified, it will be used the minimum
   bandwidth available for the specified seller profile.
   EOF
-  default     = null
+  default     = 0
 }
 
 variable "speed_unit" {
   type        = string
   description = "Unit of the speed/bandwidth to be allocated to the connection."
-  default     = null
+  default     = ""
 
   validation {
     condition = (
-      var.speed_unit == null ? true : contains(["GB", "MB"], var.speed_unit)
+      var.speed_unit == "" ? true : contains(["GB", "MB"], var.speed_unit)
     )
     error_message = "Valid values for 'speed_unit' are (MB, GB)."
   } 
@@ -47,7 +47,7 @@ variable "seller_authorization_key" {
   Text field used to authorize connection on the provider side. Value depends on a provider service
   profile used for connection.
   EOF
-  default = null
+  default = ""
 }
 
 variable "seller_metro_code" {
@@ -56,11 +56,11 @@ variable "seller_metro_code" {
   Metro code where the connection will be created. If you do not know the code,'seller_metro_name' can be use
   instead.
   EOF
-  default     = null
+  default     = ""
 
   validation {
     condition = ( 
-      var.seller_metro_code == null ? true : can(regex("^[A-Z]{2}$", var.seller_metro_code))
+      var.seller_metro_code == "" ? true : can(regex("^[A-Z]{2}$", var.seller_metro_code))
     )
     error_message = "Valid metro code consits of two capital leters, i.e. 'FR', 'SV', 'DC'."
   }
@@ -73,7 +73,7 @@ variable "seller_metro_name" {
   'Frankfurt', 'Silicon Valley', 'Ashburn'. One of 'seller_metro_code', 'seller_metro_name' must be
   provided.
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "seller_region" {
@@ -83,7 +83,7 @@ variable "seller_region" {
   region of a service provider with several regions per metro. Generally there is only one region per metro, and it
   will be used the first available region in the metro of the specified seller profile.
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "notification_users" {
@@ -99,7 +99,7 @@ variable "notification_users" {
 variable "purcharse_order_number" {
   type        = string
   description = "Connection's purchase order number to reflect on the invoice."
-  default     = null
+  default     = ""
 }
 
 variable "vlan_stag" {
@@ -108,13 +108,13 @@ variable "vlan_stag" {
   S-Tag/Outer-Tag of the primary connection - a numeric character ranging from 2 - 4094. Required if
   'port_name' is specified.
   EOF
-  default     = null
+  default     = 0
 }
 
 variable "vlan_ctag" {
   type        = number
   description = "C-Tag/Inner-Tag of the primary connection - a numeric character ranging from 2 - 4094."
-  default     = null
+  default     = 0
 }
 
 variable "zside_port_name" {
@@ -125,7 +125,7 @@ variable "zside_port_name" {
   profile, this option offers a simple, streamlined way to set up a connection between your own ports. Not compatible
   with redundant connections"
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "zside_vlan_stag" {
@@ -134,7 +134,7 @@ variable "zside_vlan_stag" {
   S-Tag/Outer-Tag of the connection on the Z side. Required if 'zside_port_name' is specified. A numeric
   character ranging from 2 - 4094.
   EOF
-  default     = null
+  default     = 0
 }
 
 variable "zside_vlan_ctag" {
@@ -143,7 +143,7 @@ variable "zside_vlan_ctag" {
   C-Tag/Inner-Tag of the connection on the Z side. This is only applicable for named_tag 'MANUAL'. A numeric character
   ranging from 2 - 4094.
   EOF
-  default     = null
+  default     = 0
 }
 
 variable "named_tag" {
@@ -152,7 +152,7 @@ variable "named_tag" {
   The type of peering to set up in case when connecting to Azure Express Route. One of 'PRIVATE', 'MICROSOFT',
   'MANUAL'.
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "service_token_id" {
@@ -161,13 +161,13 @@ variable "service_token_id" {
   Unique Equinix Fabric key shared with you by a provider that grants you authorization to use their interconnection
   asset from which the connection would originate.
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "network_edge_id" {
   type        = string
   description = "Unique identifier of the Network Edge virtual device from which the connection would originate."
-  default     = null
+  default     = ""
 }
 
 variable "network_edge_interface_id" {
@@ -176,7 +176,7 @@ variable "network_edge_interface_id" {
   Applicable with 'network_edge_id', identifier of network interface on a given device, used for a connection. If not
   specified then first available interface will be selected.
   EOF
-  default     = null
+  default     = 0
 }
 
 variable "redundancy_type" {
@@ -196,7 +196,7 @@ variable "redundancy_type" {
 variable "secondary_name" {
   type        = string
   description = "Name of the secondary connection that will be created. It will be auto-generated if not specified."
-  default     = null
+  default     = ""
 }
 
 variable "secondary_port_name" {
@@ -206,7 +206,7 @@ variable "secondary_port_name" {
   'port_name' is specified, and 'redundancy_type' is 'Redundant', then the value of 'port_name' will be
   used.
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "secondary_speed" {
@@ -215,7 +215,7 @@ variable "secondary_speed" {
   Speed/Bandwidth to be allocated to the secondary connection - (MB or GB). If not specified then primary connection
   speed will be used.
   EOF
-  default     = null
+  default     = 0
 }
 
 variable "secondary_speed_unit" {
@@ -224,11 +224,11 @@ variable "secondary_speed_unit" {
   Unit of the speed/bandwidth to be allocated to the secondary connection. If not specified then primary connection
   speed unit will be used.
   EOF
-  default     = null
+  default     = ""
 
   validation {
     condition = (
-      var.secondary_speed_unit == null ? true : contains(["GB", "MB"], var.secondary_speed_unit)
+      var.secondary_speed_unit == "" ? true : contains(["GB", "MB"], var.secondary_speed_unit)
     )
     error_message = "Valid values for 'secondary_speed_unit' are (MB, GB)."
   } 
@@ -240,13 +240,13 @@ variable "secondary_vlan_stag" {
   S-Tag/Outer-Tag of the secondary connection. A numeric character ranging from 2 - 4094. Required if
   'secondary_port_name' is specified. 
   EOF
-  default     = null
+  default     = 0
 }
 
 variable "secondary_vlan_ctag" {
   type        = number
   description = "C-Tag/Inner-Tag of the secondary connection - a numeric character ranging from 2 - 4094."
-  default     = null
+  default     = 0
 }
 
 variable "secondary_seller_authorization_key" {
@@ -255,7 +255,7 @@ variable "secondary_seller_authorization_key" {
   Text field used to authorize secondary connection on the provider side. Value depends on a provider service profile
   used for connection.
   EOF
-  default = null
+  default = ""
 }
 
 variable "secondary_seller_metro_code" {
@@ -264,11 +264,11 @@ variable "secondary_seller_metro_code" {
   Metro code where the secondary connection will be created. If not specified then primary connection metro code will
   be used.
   EOF
-  default     = null
+  default     = ""
 
   validation {
     condition = ( 
-      var.secondary_seller_metro_code == null ? true : can(regex("^[A-Z]{2}$", var.secondary_seller_metro_code))
+      var.secondary_seller_metro_code == "" ? true : can(regex("^[A-Z]{2}$", var.secondary_seller_metro_code))
     )
     error_message = "Valid metro code consits of two capital leters, i.e. 'FR', 'SV', 'DC'."
   }
@@ -280,7 +280,7 @@ variable "secondary_seller_metro_name" {
   Metro name where the secondary connection will be created, i.e. 'Frankfurt', 'Silicon Valley', 'Ashburn'. If not
   specified then primary connection metro name will be used.
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "secondary_seller_region" {
@@ -289,7 +289,7 @@ variable "secondary_seller_region" {
   The region in which the seller port resides, i.e. 'eu-west-1'. If not specified then primary connection region will
   be used.
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "network_edge_secondary_id" {
@@ -299,7 +299,7 @@ variable "network_edge_secondary_id" {
   specified, and 'network_edge_id' is specified, and 'redundancy_type' is 'Redundant' then primary edge device will
   be used.
   EOF
-  default     = null
+  default     = ""
 }
 
 variable "network_edge_secondary_interface_id" {
@@ -308,7 +308,7 @@ variable "network_edge_secondary_interface_id" {
   Applicable with 'network_edge_secondary_id', identifier of network interface on a given device, used for a
   connection. If not specified then first available interface will be selected.
   EOF
-  default     = null
+  default     = 0
 }
 
 variable "secondary_service_token_id" {
@@ -318,5 +318,5 @@ variable "secondary_service_token_id" {
   asset from which the secondary connection would originate. Required if 'service_token_id' is specified, and
   'redundancy_type' is 'Redundant'.
   EOF
-  default     = null
+  default     = ""
 }
