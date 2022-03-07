@@ -1,15 +1,79 @@
-# TEMPLATE: Consider the attributes users of this module will need to take advantage of this module
-# TEMPLATE: in a new module that depends on this module (addresses, credentials, filenames).
-# TEMPLATE: All outputs must have a description. Do not include descriptions or help text in the
-# TEMPLATE: value, use the description field.
-# TEMPLATE:
-# TEMPLATE: Declare all outputs in this file, sprawling declarations are difficult to identify.
-# TEMPLATE:
-# TEMPLATE: https://www.terraform.io/docs/language/values/outputs.html
-# TEMPLATE: https://www.terraform.io/docs/language/expressions/types.html
-#
-output "example" {
-  description = "The example output. In practice, do not produce output values that mirror variables, the user has this value already."
-  sensitive   = false
-  value       = var.example
+output "primary_connection_uuid" {
+  description = "Unique identifier of the connection."
+  value       = equinix_ecx_l2_connection.this.uuid
+}
+
+output "primary_connection_name" {
+  description = "Name of the connection."
+  value       = equinix_ecx_l2_connection.this.name
+}
+
+output "primary_connection_status" {
+  description = "Connection provisioning status."
+  value       = equinix_ecx_l2_connection.this.status
+}
+
+output "primary_connection_provider_status" {
+  description = "Connection provisioning provider status."
+  value       = equinix_ecx_l2_connection.this.provider_status
+}
+
+output "primary_connection_speed" {
+  description = "Connection speed."
+  value       = equinix_ecx_l2_connection.this.speed
+}
+
+output "primary_connection_speed_unit" {
+  description = "Connection speed unit."
+  value       = equinix_ecx_l2_connection.this.speed_unit
+}
+
+output "primary_connection_seller_metro" {
+  description = "Connection seller metro code."
+  value       = equinix_ecx_l2_connection.this.seller_metro_code
+}
+
+output "primary_connection_seller_region" {
+  description = "Connection seller region."
+  value       = equinix_ecx_l2_connection.this.seller_region
+}
+
+output "secondary_connection_uuid" {
+  description = "Unique identifier of the secondary connection."
+  value       = equinix_ecx_l2_connection.this.secondary_connection.0.uuid
+}
+
+output "secondary_connection_name" {
+  description = "Name of the secondary connection."
+  value       = equinix_ecx_l2_connection.this.secondary_connection.0.name
+}
+
+output "secondary_connection_status" {
+  description = "Secondary connection provisioning status."
+  value       = equinix_ecx_l2_connection.this.secondary_connection.0.status
+}
+
+output "secondary_connection_provider_status" {
+  description = "Secondary connection provisioning provider status."
+  value       = equinix_ecx_l2_connection.this.secondary_connection.0.provider_status
+}
+
+output "secondary_connection_speed" {
+  description = "Secondary connection speed."
+  value       = equinix_ecx_l2_connection.this.secondary_connection.0.speed
+}
+
+output "secondary_connection_speed_unit" {
+  description = "Secondary connection speed unit."
+  value       = equinix_ecx_l2_connection.this.secondary_connection.0.speed_unit
+}
+
+output "secondary_connection_seller_metro" {
+  description = "Secondary connection seller metro code."
+  value       = equinix_ecx_l2_connection.this.secondary_connection.0.seller_metro_code
+}
+
+output "secondary_connection_seller_region" {
+  description = "Connection seller region."
+  value       = equinix_ecx_l2_connection.this.secondary_connection.0.seller_metro_region
 }
