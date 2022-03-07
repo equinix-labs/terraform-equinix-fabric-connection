@@ -75,8 +75,8 @@ Run `terraform init -upgrade` and `terraform apply`.
 
 #### Variables
 
-See <https://registry.terraform.io/modules/equinix-labs/connection/equinix/latest?tab=inputs> for a description of all variables.
+See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest?tab=inputs> for a description of all variables.
 
 #### Outputs
 
-See <https://registry.terraform.io/modules/equinix-labs/connection/equinix/latest?tab=outputs> for a description of all outputs.
+See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest?tab=outputs> for a description of all outputs.
