@@ -19,7 +19,7 @@ As part of Platform Equinix, your infrastructure can connect with other parties,
 └────────────────┘                                 └────────────────────┘
 ```
 
-> **NOTE:** 
+-> **NOTE:**
 Setting Up an Equinix Fabric connection requires combine and configure several parameters depending on the origin and destination types. It also requires configuration in the platform of the service you are connecting to, such as creating an Interconnect Attachment in Google Cloud platform, or approving a Direct Connect request in AWS. Although this module can be used directly, it is intended to be consumed by other service-specific modules to abstract you from this process and to include also all the necessary configuration on the target platform.
 
 ### Usage
@@ -75,8 +75,8 @@ Run `terraform init -upgrade` and `terraform apply`.
 
 #### Variables
 
-See <https://registry.terraform.io/modules/equinix-labs/connection/equinix/latest?tab=inputs> for a description of all variables.
+See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest?tab=inputs> for a description of all variables.
 
 #### Outputs
 
-See <https://registry.terraform.io/modules/equinix-labs/connection/equinix/latest?tab=outputs> for a description of all outputs.
+See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest?tab=outputs> for a description of all outputs.
