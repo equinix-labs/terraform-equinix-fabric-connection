@@ -3,8 +3,8 @@ provider "equinix" {
   # client_secret = "someSecret"
 }
 
-module "equinix_fabric_connection" {
-  source = "github.com/equinix-labs/terraform-equinix-connection"
+module "equinix-fabric-connection" {
+  source = "github.com/equinix-labs/terraform-equinix-fabric-connection"
 
   # required variables
   notification_users = ["example@equinix.com"]
@@ -17,9 +17,13 @@ module "equinix_fabric_connection" {
 }
 
 output "fabric_connection_id" {
-  value = module.equinix_fabric_connection.primary_connection_uuid
+  value = module.equinix-fabric-connection.primary_connection.id
 }
 
-output "fabric_connection_name" {
-  value = module.equinix_fabric_connection.primary_connection_name
+output "fabric_connection_status" {
+  value = module.equinix-fabric-connection.primary_connection.status
+}
+
+output "fabric_connection_provider_status" {
+  value = module.equinix-fabric-connection.primary_connection.provider_status
 }
