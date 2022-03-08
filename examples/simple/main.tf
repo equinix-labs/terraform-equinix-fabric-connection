@@ -1,6 +1,6 @@
 provider "equinix" {
-  # client_id     = "someID"
-  # client_secret = "someSecret"
+  client_id     = "someID"
+  client_secret = "someSecret"
 }
 
 module "equinix-fabric-connection" {
