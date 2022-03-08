@@ -1,9 +1,9 @@
-# Equinix Fabric L2 Connection Terraform module
+## Equinix Fabric L2 Connection Terraform module
 
 [![Experimental](https://img.shields.io/badge/Stability-Experimental-red.svg)](https://github.com/equinix-labs/standards#about-uniform-standards)
 [![terraform](https://github.com/equinix-labs/terraform-equinix-template/actions/workflows/integration.yaml/badge.svg)](https://github.com/equinix-labs/terraform-equinix-template/actions/workflows/integration.yaml)
 
-`terraform-equinix-connection` is a minimal Terraform module that utilizes [Terraform provider for Equinix](https://registry.terraform.io/providers/equinix/equinix/latest) to set up an Equinix Fabric L2 connection.
+`terraform-equinix-fabric-connection` is a minimal Terraform module that utilizes [Terraform provider for Equinix](https://registry.terraform.io/providers/equinix/equinix/latest) to set up an Equinix Fabric L2 connection.
 
 As part of Platform Equinix, your infrastructure can connect with other parties, such as public cloud providers, network service providers, or your own colocation cages in Equinix by defining an [Equinix Fabric - software-defined interconnection](https://docs.equinix.com/en-us/Content/Interconnection/Fabric/Fabric-landing-main.htm).
 
@@ -36,13 +36,10 @@ To use this module in a new project, create a file such as:
 
 ```hcl
 # main.tf
-provider "equinix" {
-  client_id     = "someID"
-  client_secret = "someSecret"
-}
+provider "equinix" {}
 
 module "equinix_fabric_connection" {
-  source = "github.com/equinix-labs/terraform-equinix-connection"
+  source  = "equinix-labs/fabric-connection/equinix"
 
   # required variables
   notification_users = ["example@equinix.com"]
@@ -80,3 +77,7 @@ See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equini
 #### Outputs
 
 See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest?tab=outputs> for a description of all outputs.
+
+### Examples
+
+- [examples/simple](examples/simple/)
