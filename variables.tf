@@ -37,7 +37,7 @@ variable "speed_unit" {
     condition = (
       var.speed_unit == "" ? true : contains(["GB", "MB"], var.speed_unit)
     )
-    error_message = "Valid values for 'speed_unit' are (MB, GB)."
+    error_message = "Valid values are (MB, GB)."
   } 
 }
 
@@ -189,7 +189,7 @@ variable "redundancy_type" {
 
   validation {
     condition = (contains(["Single", "Redundant"], var.redundancy_type))
-    error_message = "Valid values for 'redundancy_type' are (single, redundant)."
+    error_message = "Valid values for 'redundancy_type' are (Single, Redundant)."
   } 
 }
 
@@ -230,7 +230,7 @@ variable "secondary_speed_unit" {
     condition = (
       var.secondary_speed_unit == "" ? true : contains(["GB", "MB"], var.secondary_speed_unit)
     )
-    error_message = "Valid values for 'secondary_speed_unit' are (MB, GB)."
+    error_message = "Valid values are (MB, GB)."
   } 
 }
 

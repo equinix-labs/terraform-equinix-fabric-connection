@@ -36,7 +36,7 @@ locals  {
    ][0] : var.seller_metro_code
 
   primary_region = (var.seller_region == "" && var.seller_profile_name != "") ? [
-    for metro in data.equinix_ecx_l2_sellerprofile.seller[0].metro : keys(metro.regions)[0]
+    for metro in data.equinix_ecx_l2_sellerprofile.seller[0].metro : try(keys(metro.regions)[0], null)
     if metro.code == local.primary_seller_metro_code
   ][0] : var.seller_region
 
@@ -78,7 +78,7 @@ resource "equinix_ecx_l2_connection" "this" {
   zside_vlan_ctag       = var.zside_vlan_ctag != 0 ? var.zside_vlan_ctag : null
   
   dynamic "secondary_connection" {
-    for_each = var.redundancy_type == "redundant" ? [1] : []
+    for_each = var.redundancy_type == "Redundant" ? [1] : []
     content {
         name                = local.secondary_name
         speed               = var.secondary_speed != 0 ? var.secondary_speed : null
@@ -89,7 +89,7 @@ resource "equinix_ecx_l2_connection" "this" {
         device_uuid         = var.network_edge_id != "" ? coalesce(var.network_edge_secondary_id, var.network_edge_id) : null
         device_interface_id = var.network_edge_secondary_interface_id != 0 ? var.network_edge_secondary_interface_id : null
         service_token       = var.secondary_service_token_id != 0 ? var.secondary_service_token_id : null
-        seller_metro_code   = local.secondary_seller_metro_code
+        seller_metro_code   = local.secondary_seller_metro_code != "" ? local.secondary_seller_metro_code : null
         seller_region       = var.secondary_seller_region != "" ? var.secondary_seller_region : null
         authorization_key   = var.secondary_seller_authorization_key != "" ? var.secondary_seller_authorization_key : null
     }
