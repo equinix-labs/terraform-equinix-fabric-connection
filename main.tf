@@ -88,7 +88,7 @@ resource "equinix_ecx_l2_connection" "this" {
         vlan_ctag           = var.secondary_vlan_ctag != 0 ? var.secondary_vlan_ctag : null
         device_uuid         = var.network_edge_id != "" ? coalesce(var.network_edge_secondary_id, var.network_edge_id) : null
         device_interface_id = var.network_edge_secondary_interface_id != 0 ? var.network_edge_secondary_interface_id : null
-        service_token       = var.secondary_service_token_id != 0 ? var.secondary_service_token_id : null
+        service_token       = var.service_token_id != "" && var.secondary_service_token_id != "" ? var.secondary_service_token_id : null
         seller_metro_code   = local.secondary_seller_metro_code != "" ? local.secondary_seller_metro_code : null
         seller_region       = var.secondary_seller_region != "" ? var.secondary_seller_region : null
         authorization_key   = var.secondary_seller_authorization_key != "" ? var.secondary_seller_authorization_key : null
