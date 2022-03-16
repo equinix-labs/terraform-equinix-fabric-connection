@@ -305,8 +305,8 @@ variable "network_edge_secondary_id" {
 variable "network_edge_secondary_interface_id" {
   type        = number
   description = <<EOF
-  Applicable with 'network_edge_secondary_id', identifier of network interface on a given device, used for a
-  connection. If not specified then first available interface will be selected.
+  Applicable with 'network_edge_id' or 'network_edge_secondary_id', identifier of network interface on a given device,
+  used for a connection. If not specified then first available interface will be selected.
   EOF
   default     = 0
 }
