@@ -182,14 +182,14 @@ variable "network_edge_interface_id" {
 variable "redundancy_type" {
   type        = string
   description = <<EOF
-  Whether to create a single connection or redundant. Fabric secondary variables will have no effect unless value
-  'Redundant' is specified.
+  Whether to create a single connection or redundant. Fabric secondary variables will take no effect unless value
+  'REDUNDANT' is specified.
   EOF
-  default     = "Single"
+  default     = "SINGLE"
 
   validation {
-    condition = (contains(["Single", "Redundant"], var.redundancy_type))
-    error_message = "Valid values for 'redundancy_type' are (Single, Redundant)."
+    condition = (contains(["SINGLE", "REDUNDANT"], var.redundancy_type))
+    error_message = "Valid values for 'redundancy_type' are (SINGLE, REDUNDANT)."
   } 
 }
 
@@ -203,7 +203,7 @@ variable "secondary_port_name" {
   type        = string
   description = <<EOF
   Name of the buyer's port from which the secondary connection would originate. If not specified, and
-  'port_name' is specified, and 'redundancy_type' is 'Redundant', then the value of 'port_name' will be
+  'port_name' is specified, and 'redundancy_type' is 'REDUNDANT', then the value of 'port_name' will be
   used.
   EOF
   default     = ""
@@ -296,7 +296,7 @@ variable "network_edge_secondary_id" {
   type        = string
   description = <<EOF
   Unique identifier of the Network Edge virtual device from which the secondary connection would originate. If not
-  specified, and 'network_edge_id' is specified, and 'redundancy_type' is 'Redundant' then primary edge device will
+  specified, and 'network_edge_id' is specified, and 'redundancy_type' is 'REDUNDANT' then primary edge device will
   be used.
   EOF
   default     = ""
@@ -316,7 +316,7 @@ variable "secondary_service_token_id" {
   description = <<EOF
   Unique Equinix Fabric key shared with you by a provider that grants you authorization to use their interconnection
   asset from which the secondary connection would originate. Required if 'service_token_id' is specified, and
-  'redundancy_type' is 'Redundant'.
+  'redundancy_type' is 'REDUNDANT'.
   EOF
   default     = ""
 }

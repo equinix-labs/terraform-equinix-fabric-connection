@@ -78,7 +78,7 @@ resource "equinix_ecx_l2_connection" "this" {
   zside_vlan_ctag       = var.zside_vlan_ctag != 0 ? var.zside_vlan_ctag : null
   
   dynamic "secondary_connection" {
-    for_each = var.redundancy_type == "Redundant" ? [1] : []
+    for_each = var.redundancy_type == "REDUNDANT" ? [1] : []
     content {
         name                = local.secondary_name
         speed               = var.secondary_speed != 0 ? var.secondary_speed : null

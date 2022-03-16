@@ -51,7 +51,7 @@ module "equinix_fabric_connection" {
   port_name                = "Fabric-Port-FR-Pri"
   vlan_stag                = 1010
   named_tag                = "PRIVATE"
-  redundancy_type          = "Redundant"
+  redundancy_type          = "REDUNDANT"
   secondary_port_name      = "Fabric-Port-FR-Sec"
   secondary_vlan_stag      = 1020
 }
