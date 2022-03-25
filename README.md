@@ -22,6 +22,10 @@ As part of Platform Equinix, your infrastructure can connect with other parties,
 -> **NOTE:**
 Setting Up an Equinix Fabric connection requires combine and configure several parameters depending on the origin and destination types. It also requires configuration in the platform of the service you are connecting to, such as creating an Interconnect Attachment in Google Cloud platform, or approving a Direct Connect request in AWS. Although this module can be used directly, it is intended to be consumed by other service-specific modules to abstract you from this process and to include also all the necessary configuration on the target platform.
 
+Follow the link below to take a look at the available service-specific modules:
+
+https://registry.terraform.io/search/modules?namespace=equinix-labs&q=fabric-connection
+
 ### Usage
 
 This project is experimental and supported by the user community. Equinix does not provide support for this project.
