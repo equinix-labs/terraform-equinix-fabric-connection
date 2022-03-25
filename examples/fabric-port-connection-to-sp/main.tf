@@ -4,7 +4,7 @@ provider "equinix" {
 }
 
 module "equinix-fabric-connection" {
-  source = "github.com/equinix-labs/terraform-equinix-fabric-connection"
+  source = "equinix-labs/fabric-connection/equinix"
 
   # required variables
   notification_users = ["example@equinix.com"]

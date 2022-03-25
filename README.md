@@ -63,10 +63,18 @@ module "equinix_fabric_connection" {
 
 Run `terraform init -upgrade` and `terraform apply`.
 
-#### Resources
+### Variables
+
+See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest?tab=inputs> for a description of all variables.
+
+### Outputs
+
+See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest?tab=outputs> for a description of all outputs.
+
+### Resources
 
 | Name | Type |
-| :-----: | :------: |
+|------|------|
 | [random_string.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [equinix_ecx_l2_connection.this](https://registry.terraform.io/providers/equinix/equinix/latest/docs/resources/equinix_ecx_l2_connection) | resource |
 | [equinix_ecx_l2_sellerprofile.this](https://registry.terraform.io/providers/equinix/equinix/latest/docs/data-sources/equinix_ecx_l2_sellerprofile) | data source |
@@ -74,14 +82,6 @@ Run `terraform init -upgrade` and `terraform apply`.
 | [equinix_ecx_port.secondary](https://registry.terraform.io/providers/equinix/equinix/latest/docs/data-sources/equinix_ecx_port) | data source |
 | [equinix_ecx_port.zside](https://registry.terraform.io/providers/equinix/equinix/latest/docs/data-sources/equinix_ecx_port) | data source |
 
-#### Variables
-
-See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest?tab=inputs> for a description of all variables.
-
-#### Outputs
-
-See <https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest?tab=outputs> for a description of all outputs.
-
 ### Examples
 
-- [examples/simple](examples/simple/)
+- [Fabric Port connection to Service Provider](https://registry.terraform.io/modules/equinix-labs/fabric-connection/equinix/latest/examples/fabric-port-connection-to-sp/)
