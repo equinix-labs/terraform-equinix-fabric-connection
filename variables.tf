@@ -140,7 +140,7 @@ variable "zside_vlan_stag" {
 variable "zside_vlan_ctag" {
   type        = number
   description = <<EOF
-  C-Tag/Inner-Tag of the connection on the Z side. This is only applicable for named_tag 'MANUAL'. A numeric character
+  C-Tag/Inner-Tag of the connection on the Z side. This is only applicable with 'named_tag'. A numeric character
   ranging from 2 - 4094.
   EOF
   default     = 0
@@ -149,8 +149,7 @@ variable "zside_vlan_ctag" {
 variable "named_tag" {
   type        = string
   description = <<EOF
-  The type of peering to set up in case when connecting to Azure Express Route. One of 'PRIVATE', 'MICROSOFT',
-  'MANUAL'.
+  The type of peering to set up in case when connecting to Azure Express Route. One of 'PRIVATE', 'MICROSOFT'.
   EOF
   default     = ""
 }

@@ -57,7 +57,7 @@ resource "random_string" "this" {
 }
 
 resource "equinix_ecx_l2_connection" "this" {
-  name                  = local.secondary_name != "" ? format("%s-PRI", local.primary_name) : local.primary_name
+  name                  = var.redundancy_type == "REDUNDANT" && var.secondary_name == "" && var.name == "" ? format("%s-PRI", local.primary_name) : local.primary_name
   profile_uuid          = var.seller_profile_name != "" ? data.equinix_ecx_l2_sellerprofile.seller[0].uuid : null
   speed                 = local.primary_speed
   speed_unit            = local.primary_speed_unit
