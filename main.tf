@@ -77,6 +77,15 @@ resource "equinix_ecx_l2_connection" "this" {
   zside_vlan_stag       = var.zside_vlan_stag != 0 ? var.zside_vlan_stag : null
   zside_vlan_ctag       = var.zside_vlan_ctag != 0 ? var.zside_vlan_ctag : null
   
+  dynamic "additional_info" {
+    for_each = var.additional_info
+
+    content {
+      name = additional_info.value.name
+      value = additional_info.value.value
+    }
+  }
+
   dynamic "secondary_connection" {
     for_each = var.redundancy_type == "REDUNDANT" ? [1] : []
     content {
