@@ -62,7 +62,7 @@ resource "equinix_ecx_l2_connection" "this" {
   speed                 = local.primary_speed
   speed_unit            = local.primary_speed_unit
   notifications         = var.notification_users
-  purchase_order_number = var.purcharse_order_number != "" ? var.purcharse_order_number : null
+  purchase_order_number = var.purchase_order_number != "" ? var.purchase_order_number : null
   seller_metro_code     = local.primary_seller_metro_code
   seller_region         = local.primary_region
   authorization_key     = var.seller_authorization_key != "" ? var.seller_authorization_key : null
@@ -76,6 +76,7 @@ resource "equinix_ecx_l2_connection" "this" {
   zside_port_uuid       = var.zside_port_name != "" ? data.equinix_ecx_port.zside[0].id : null
   zside_vlan_stag       = var.zside_vlan_stag != 0 ? var.zside_vlan_stag : null
   zside_vlan_ctag       = var.zside_vlan_ctag != 0 ? var.zside_vlan_ctag : null
+  zside_service_token   = var.zside_service_token_id != "" ? var.zside_service_token_id : null
   
   dynamic "additional_info" {
     for_each = var.additional_info

@@ -103,7 +103,7 @@ variable "notification_users" {
   }
 }
 
-variable "purcharse_order_number" {
+variable "purchase_order_number" {
   type        = string
   description = "Connection's purchase order number to reflect on the invoice."
   default     = ""
@@ -182,7 +182,16 @@ variable "service_token_id" {
   type        = string
   description = <<EOF
   Unique Equinix Fabric key shared with you by a provider that grants you authorization to use
-  their interconnection asset from which the connection would originate.
+  their interconnection asset from (a-side) which the connection would originate.
+  EOF
+  default     = ""
+}
+
+variable "zside_service_token_id" {
+  type        = string
+  description = <<EOF
+  Unique Equinix Fabric key shared with you by a provider that grants you authorization to use
+  their interconnection asset to (z-side) which the connection would arrive.
   EOF
   default     = ""
 }
@@ -348,7 +357,7 @@ variable "secondary_service_token_id" {
   type        = string
   description = <<EOF
   Unique Equinix Fabric key shared with you by a provider that grants you authorization to use
-  their interconnection asset from which the secondary connection would originate. Required if
+  their interconnection asset from (a-side) which the secondary connection would originate. Required if
   'service_token_id' is specified, and 'redundancy_type' is 'REDUNDANT'.
   EOF
   default     = ""
