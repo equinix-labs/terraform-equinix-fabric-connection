@@ -1,3 +1,13 @@
+## 0.3.0 (July 19, 2022)
+
+FEATURES:
+
+- Added input variable `zside_service_token_id` to support single connections using z-side Equinix Service Tokens
+
+BUG FIXES:
+
+- typo `purchase_order` was `purcharse_order` [#1](https://github.com/equinix-labs/terraform-equinix-fabric-connection/issues/1)
+
 ## 0.2.0 (April 27, 2022)
 
 FEATURES:
