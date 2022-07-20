@@ -1,3 +1,9 @@
+## 0.3.1 (July 20, 2022)
+
+BUG FIXES:
+
+- `equinix_ecx_l2_connection.seller_metro_code` and `equinix_ecx_l2_connection.seller_region` must be null if `seller_profile_name` is not specified
+
 ## 0.3.0 (July 19, 2022)
 
 FEATURES:

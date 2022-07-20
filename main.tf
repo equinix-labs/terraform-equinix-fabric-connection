@@ -30,17 +30,19 @@ locals  {
     if band.speed == local.primary_speed
   ][0] : var.speed_unit
 
-  primary_seller_metro_code = (var.seller_metro_name != "" && var.seller_profile_name != "") ? [
+  primary_seller_metro_code = var.seller_profile_name != "" ? var.seller_metro_code == "" ? [
     for metro in data.equinix_ecx_l2_sellerprofile.seller[0].metro : metro.code
     if metro.name == title(var.seller_metro_name)
-   ][0] : var.seller_metro_code
+  ][0] : var.seller_metro_code : null
 
-  primary_region = (var.seller_region == "" && var.seller_profile_name != "") ? [
+  primary_region = var.seller_profile_name != "" ? var.seller_region == "" ? [
     for metro in data.equinix_ecx_l2_sellerprofile.seller[0].metro : try(keys(metro.regions)[0], null)
     if metro.code == local.primary_seller_metro_code
-  ][0] : var.seller_region
+  ][0] : var.seller_region : null
 
-  primary_name  = var.name != "" ? var.name : upper(format("%s-%s-%s", split(" ", coalesce(var.seller_profile_name, var.zside_port_name))[0], local.primary_seller_metro_code, random_string.this.result))
+  primary_name  = var.name != "" ? var.name : upper(format("%s-%s-%s", split(" ", coalesce(
+    var.seller_profile_name, var.zside_port_name
+  ))[0], local.primary_seller_metro_code, random_string.this.result))
 
   secondary_seller_metro_code = (var.secondary_seller_metro_name != "" && var.seller_profile_name != "") ? [
     for metro in data.equinix_ecx_l2_sellerprofile.seller[0].metro : metro.code

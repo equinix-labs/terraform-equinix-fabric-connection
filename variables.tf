@@ -75,9 +75,8 @@ variable "seller_metro_code" {
 variable "seller_metro_name" {
   type        = string
   description = <<EOF
-  Only required in the absence of 'seller_metro_code'. Metro name where the connection will be
-  created, i.e. 'Frankfurt', 'Silicon Valley', 'Ashburn'. One of 'seller_metro_code',
-  'seller_metro_name' must be provided.
+  Metro name where the connection will be created, i.e. 'Frankfurt', 'Silicon Valley', 'Ashburn'.
+  Only required if 'seller_profile_name' is specified and in the absence of 'seller_metro_code'.
   EOF
   default     = ""
 }
