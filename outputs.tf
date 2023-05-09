@@ -5,5 +5,5 @@ output "primary_connection" {
 
 output "secondary_connection" {
   description = "Secondary connection data."
-  value       =  try(equinix_ecx_l2_connection.this.secondary_connection[0], null)
+  value       = try(equinix_ecx_l2_connection.this.secondary_connection[0], null)
 }

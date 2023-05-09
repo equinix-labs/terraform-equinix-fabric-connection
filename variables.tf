@@ -44,16 +44,16 @@ variable "speed_unit" {
       var.speed_unit == "" ? true : contains(["GB", "MB"], var.speed_unit)
     )
     error_message = "Valid values are (MB, GB)."
-  } 
+  }
 }
 
 variable "seller_authorization_key" {
-  type = string
+  type        = string
   description = <<EOF
   Text field used to authorize connection on the provider side. Value depends on a provider service
   profile used for connection.
   EOF
-  default = ""
+  default     = ""
 }
 
 variable "seller_metro_code" {
@@ -65,7 +65,7 @@ variable "seller_metro_code" {
   default     = ""
 
   validation {
-    condition = ( 
+    condition = (
       var.seller_metro_code == "" ? true : can(regex("^[A-Z]{2}$", var.seller_metro_code))
     )
     error_message = "Valid metro code consits of two capital leters, i.e. 'FR', 'SV', 'DC'."
@@ -165,9 +165,9 @@ variable "named_tag" {
 }
 
 variable "additional_info" {
-  type        = list(object({
-      name    = string,
-      value   = string
+  type = list(object({
+    name  = string,
+    value = string
     })
   )
   description = <<EOF
@@ -222,9 +222,9 @@ variable "redundancy_type" {
   default     = "SINGLE"
 
   validation {
-    condition = (contains(["SINGLE", "REDUNDANT"], var.redundancy_type))
+    condition     = (contains(["SINGLE", "REDUNDANT"], var.redundancy_type))
     error_message = "Valid values for 'redundancy_type' are (SINGLE, REDUNDANT)."
-  } 
+  }
 }
 
 variable "secondary_name" {
@@ -268,7 +268,7 @@ variable "secondary_speed_unit" {
       var.secondary_speed_unit == "" ? true : contains(["GB", "MB"], var.secondary_speed_unit)
     )
     error_message = "Valid values are (MB, GB)."
-  } 
+  }
 }
 
 variable "secondary_vlan_stag" {
@@ -290,12 +290,12 @@ variable "secondary_vlan_ctag" {
 }
 
 variable "secondary_seller_authorization_key" {
-  type = string
+  type        = string
   description = <<EOF
   Text field used to authorize secondary connection on the provider side. Value depends on a
   provider service profile used for connection.
   EOF
-  default = ""
+  default     = ""
 }
 
 variable "secondary_seller_metro_code" {
@@ -307,7 +307,7 @@ variable "secondary_seller_metro_code" {
   default     = ""
 
   validation {
-    condition = ( 
+    condition = (
       var.secondary_seller_metro_code == "" ? true : can(regex("^[A-Z]{2}$", var.secondary_seller_metro_code))
     )
     error_message = "Valid metro code consits of two capital leters, i.e. 'FR', 'SV', 'DC'."
