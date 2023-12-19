@@ -311,7 +311,7 @@ variable "secondary_speed_unit" {
   default     = ""
 
   validation {
-    condition     = var.speed_unit == ""
+    condition     = var.secondary_speed_unit == ""
     error_message = <<EOF
     The 'secondary_speed_unit' variable is deprecated and should not be set. Please remove this
     variable from your configuration.
