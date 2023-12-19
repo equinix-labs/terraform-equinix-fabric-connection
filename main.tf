@@ -1,56 +1,35 @@
-data "equinix_ecx_l2_sellerprofile" "seller" {
+data "equinix_fabric_service_profiles" "sp" {
   count = var.seller_profile_name != "" ? 1 : 0
-  name  = var.seller_profile_name
+
+  filter {
+    property = "/name"
+    operator = "="
+    values = [var.seller_profile_name]
+  }
 }
 
-data "equinix_ecx_port" "primary" {
+data "equinix_fabric_ports" "primary" {
   count = var.port_name != "" ? 1 : 0
-  name  = var.port_name
+
+  filters {
+    name = var.port_name
+  }
 }
 
-data "equinix_ecx_port" "secondary" {
+data "equinix_fabric_ports" "secondary" {
   count = var.secondary_port_name != "" ? 1 : 0
-  name  = var.secondary_port_name
+
+  filters {
+    name = var.secondary_port_name
+  }
 }
 
-data "equinix_ecx_port" "zside" {
+data "equinix_fabric_ports" "zside" {
   count = var.zside_port_name != "" ? 1 : 0
-  name  = var.zside_port_name
-}
 
-locals {
-  primary_speed = ((var.speed == null || var.speed == 0) && var.seller_profile_name != "") ? [
-    for s in sort(formatlist("%03d", [
-      for band in data.equinix_ecx_l2_sellerprofile.seller[0].speed_band : band.speed
-    ])) : tonumber(s)
-  ][0] : var.speed
-
-  primary_speed_unit = (var.speed_unit == "" && var.seller_profile_name != "") ? [
-    for band in data.equinix_ecx_l2_sellerprofile.seller[0].speed_band : band.speed_unit
-    if band.speed == local.primary_speed
-  ][0] : var.speed_unit
-
-  primary_seller_metro_code = var.seller_profile_name != "" ? var.seller_metro_code == "" ? [
-    for metro in data.equinix_ecx_l2_sellerprofile.seller[0].metro : metro.code
-    if metro.name == title(var.seller_metro_name)
-  ][0] : var.seller_metro_code : null
-
-  primary_region = var.seller_profile_name != "" ? var.seller_region == "" ? [
-    for metro in data.equinix_ecx_l2_sellerprofile.seller[0].metro : try(keys(metro.regions)[0], null)
-    if metro.code == local.primary_seller_metro_code
-  ][0] : var.seller_region : null
-
-  primary_name = var.name != "" ? var.name : upper(format("%s-%s-%s", split(" ", coalesce(
-    var.seller_profile_name, var.zside_port_name
-  ))[0], local.primary_seller_metro_code, random_string.this.result))
-
-  secondary_seller_metro_code = (var.secondary_seller_metro_name != "" && var.seller_profile_name != "") ? [
-    for metro in data.equinix_ecx_l2_sellerprofile.seller[0].metro : metro.code
-    if metro.name == title(var.secondary_seller_metro_name)
-  ][0] : var.secondary_seller_metro_code
-
-  secondary_name      = var.secondary_name != "" ? var.secondary_name : format("%s-SEC", local.primary_name)
-  secondary_port_uuid = var.secondary_port_name != "" ? data.equinix_ecx_port.secondary[0].id : null
+  filters {
+    name = var.zside_port_name
+  }
 }
 
 resource "random_string" "this" {
@@ -58,52 +37,310 @@ resource "random_string" "this" {
   special = false
 }
 
-resource "equinix_ecx_l2_connection" "this" {
-  name                  = var.redundancy_type == "REDUNDANT" && var.secondary_name == "" && var.name == "" ? format("%s-PRI", local.primary_name) : local.primary_name
-  profile_uuid          = var.seller_profile_name != "" ? data.equinix_ecx_l2_sellerprofile.seller[0].uuid : null
-  speed                 = local.primary_speed
-  speed_unit            = local.primary_speed_unit
-  notifications         = var.notification_users
-  purchase_order_number = var.purchase_order_number != "" ? var.purchase_order_number : null
-  seller_metro_code     = local.primary_seller_metro_code
-  seller_region         = local.primary_region
-  authorization_key     = var.seller_authorization_key != "" ? var.seller_authorization_key : null
-  service_token         = var.service_token_id != "" ? var.service_token_id : null
-  port_uuid             = var.port_name != "" ? data.equinix_ecx_port.primary[0].id : null
-  vlan_stag             = var.vlan_stag != 0 ? var.vlan_stag : null
-  vlan_ctag             = var.vlan_ctag != 0 ? var.vlan_ctag : null
-  device_uuid           = var.network_edge_id != "" ? var.network_edge_id : null
-  device_interface_id   = var.network_edge_interface_id != 0 ? var.network_edge_interface_id : null
-  named_tag             = var.named_tag != "" ? var.named_tag : null
-  zside_port_uuid       = var.zside_port_name != "" ? data.equinix_ecx_port.zside[0].id : null
-  zside_vlan_stag       = var.zside_vlan_stag != 0 ? var.zside_vlan_stag : null
-  zside_vlan_ctag       = var.zside_vlan_ctag != 0 ? var.zside_vlan_ctag : null
-  zside_service_token   = var.zside_service_token_id != "" ? var.zside_service_token_id : null
+resource "equinix_fabric_connection" "primary"{
+  name = var.redundancy_type == "REDUNDANT" && var.secondary_name == "" && var.name == "" ? format("%s-PRI", local.primary_name) : local.primary_name
+  type = local.connection_type
 
-  dynamic "additional_info" {
-    for_each = var.additional_info
-
+  dynamic "notifications" {
+    for_each = local.notification_users_by_type
     content {
-      name  = additional_info.value.name
-      value = additional_info.value.value
+      type = notifications.key
+      emails = notifications.value
     }
   }
 
-  dynamic "secondary_connection" {
-    for_each = var.redundancy_type == "REDUNDANT" ? [1] : []
+  additional_info = length(var.additional_info) > 0 ? [for item in var.additional_info : {
+    key   = item.name
+    value = item.value
+  }] : null
+
+  bandwidth = local.bandwidth
+
+  redundancy {
+    priority= "PRIMARY"
+  }
+
+  order {
+    purchase_order_number= var.purchase_order_number != "" ? var.purchase_order_number : null
+  }
+
+  a_side {
+    dynamic "service_token" {
+      for_each = var.service_token_id != "" ? [var.service_token_id] : []
+      content {
+        type = "VC_TOKEN"
+        uuid = service_token.value
+      }
+    }
+
+    dynamic "access_point" {
+      for_each = var.service_token_id == "" ? [1] : []
+      content {
+        type = local.aside_ap_type
+
+        peering_type = var.named_tag != "" ? var.named_tag : null
+
+        dynamic "port" {
+          for_each = var.port_name != "" ? [data.equinix_fabric_ports.primary[0].data[0].uuid] : []
+          content {
+            uuid = port.value
+          }
+        }
+
+        dynamic "link_protocol" {
+          for_each = var.port_name != "" ? [1] : []
+          content {
+            type       = local.link_protocol_type == "UNTAGGEDEPL" ? "UNTAGGED" : local.link_protocol_type
+            vlan_tag   = local.link_protocol_type == "DOT1Q" ? var.vlan_stag : null // vlanTag value specified for DOT1Q connections
+            vlan_s_tag = local.link_protocol_type == "QINQ" ? var.vlan_stag : null // vlanSTag value specified for QINQ connections
+
+            # This is adding ctag for any connection that is QINQ Aside AND not COLO on Zside OR when COLO on Zside is not QINQ Encapsulation Type
+            vlan_c_tag = local.link_protocol_type == "QINQ" && (local.zside_ap_type != "COLO" || (local.zside_ap_type == "COLO" ? local.zside_link_protocol_type != "QINQ" : false)) ? var.vlan_ctag : null
+          }
+        }
+
+        //  TODO (ocobles) support FCR
+        # dynamic "router" {
+        #   for_each = var.cloud_router_id != "" ? [var.cloud_router_id] : []
+        #   content {
+        #     uuid = router.value
+        #   }
+        # }
+
+        dynamic "virtual_device" {
+          for_each = var.network_edge_id != "" ? [var.network_edge_id] : []
+          content {
+            type = "EDGE"
+            uuid = virtual_device.value
+            // TODO (ocobles) allow use name instead of uuid
+            // name = var.network_edge_name
+          }
+        }
+
+        // Virtual device interface
+        dynamic "interface" {
+          for_each = var.network_edge_interface_id != 0 ? [var.network_edge_interface_id] : []
+          content {
+            type = "NETWORK"
+            id   = interface.value
+          }
+        }
+      }
+    }
+  }
+
+  z_side {
+    dynamic "service_token" {
+      for_each = var.zside_service_token_id != "" ? [var.zside_service_token_id] : []
+      content {
+        type = "VC_TOKEN"
+        uuid = service_token.value
+      }
+    }
+
+    dynamic "access_point" {
+      for_each = var.zside_service_token_id == "" ? [1] : []
+      content {
+        type = local.zside_ap_type
+        authentication_key = var.seller_authorization_key != "" ? var.seller_authorization_key : null
+        seller_region = local.primary_region
+
+        dynamic "profile" {
+          for_each = var.seller_profile_name != "" ? [1] : []
+          content {
+            type = data.equinix_fabric_service_profiles.sp[0].data[0].type
+            uuid = data.equinix_fabric_service_profiles.sp[0].data[0].uuid
+          }
+        }
+
+        dynamic "location" {
+          for_each = local.primary_seller_metro_code != null ? [local.primary_seller_metro_code] : []
+          content {
+            metro_code = location.value
+          }
+        }
+
+        //  TODO (ocobles) support Fabric Network
+        # dynamic "network" {
+        #   for_each = var.network_id != "" ? [var.network_id] : []
+        #   content {
+        #     uuid = network.value
+        #   }
+        # }
+
+        dynamic "port" {
+          for_each = var.zside_port_name != "" ? [data.equinix_fabric_ports.zside[0].data[0].uuid] : []
+          content {
+            uuid = port.value
+          }
+        }
+
+        dynamic "link_protocol" {
+          for_each = var.zside_port_name != "" ? [1] : []
+          content {
+            type       = local.zside_link_protocol_type == "UNTAGGEDEPL" ? "UNTAGGED" : local.zside_link_protocol_type
+            vlan_tag   = local.zside_link_protocol_type == "DOT1Q" ? var.zside_vlan_stag : null
+            vlan_s_tag = local.zside_link_protocol_type == "QINQ" ? var.zside_vlan_stag : null
+            vlan_c_tag = local.zside_link_protocol_type == "QINQ" && local.link_protocol_type != "QINQ" ? var.zside_vlan_ctag : null
+          }
+        }
+      }
+    }
+  }
+}
+
+# SECONDARY CONNECTION
+resource "equinix_fabric_connection" "secondary"{
+  count = var.redundancy_type == "REDUNDANT" ? 1 : 0
+
+  name = local.secondary_name
+  type = local.connection_type
+
+  dynamic "notifications" {
+    for_each = local.notification_users_by_type
     content {
-      name                = local.secondary_name
-      speed               = var.secondary_speed != 0 ? var.secondary_speed : null
-      speed_unit          = var.secondary_speed_unit != "" ? var.secondary_speed_unit : null
-      port_uuid           = var.port_name != "" ? coalesce(local.secondary_port_uuid, data.equinix_ecx_port.primary[0].id) : null
-      vlan_stag           = var.secondary_vlan_stag != 0 ? var.secondary_vlan_stag : null
-      vlan_ctag           = var.secondary_vlan_ctag != 0 ? var.secondary_vlan_ctag : null
-      device_uuid         = var.network_edge_id != "" ? coalesce(var.network_edge_secondary_id, var.network_edge_id) : null
-      device_interface_id = var.network_edge_secondary_interface_id != 0 ? var.network_edge_secondary_interface_id : null
-      service_token       = var.service_token_id != "" && var.secondary_service_token_id != "" ? var.secondary_service_token_id : null
-      seller_metro_code   = local.secondary_seller_metro_code != "" ? local.secondary_seller_metro_code : null
-      seller_region       = var.secondary_seller_region != "" ? var.secondary_seller_region : null
-      authorization_key   = var.secondary_seller_authorization_key != "" ? var.secondary_seller_authorization_key : null
+      type = notifications.key
+      emails = notifications.value
+    }
+  }
+
+  additional_info = length(var.additional_info) > 0 ? [for item in var.additional_info : {
+    key   = item.name
+    value = item.value
+  }] : null
+
+  bandwidth = local.secondary_bandwidth
+
+  redundancy {
+    priority = "SECONDARY"
+    group    = one(equinix_fabric_connection.primary.redundancy).group
+  }
+
+  order {
+    purchase_order_number= var.purchase_order_number != "" ? var.purchase_order_number : null
+  }
+
+  a_side {
+    dynamic "service_token" {
+      for_each = var.secondary_service_token_id != "" ? [var.secondary_service_token_id] : []
+      content {
+        type = "VC_TOKEN"
+        uuid = service_token.value
+      }
+    }
+
+    dynamic "access_point" {
+      for_each = var.service_token_id == "" ? [1] : []
+      content {
+        type = local.aside_ap_type
+
+        peering_type = var.named_tag != "" ? var.named_tag : null
+
+        dynamic "port" {
+          for_each = var.port_name != "" ? [coalesce(local.secondary_port_uuid, data.equinix_fabric_ports.primary[0].data[0].uuid)] : []
+          content {
+            uuid = port.value
+          }
+        }
+
+        dynamic "link_protocol" {
+          for_each = var.port_name != "" ? [1] : []
+          content {
+            type       = local.secondary_link_protocol_type == "UNTAGGEDEPL" ? "UNTAGGED" : local.secondary_link_protocol_type
+            vlan_tag   = local.secondary_link_protocol_type == "DOT1Q" ? var.secondary_vlan_stag : null // vlanTag value specified for DOT1Q connections
+            vlan_s_tag = local.secondary_link_protocol_type == "QINQ" ? var.secondary_vlan_stag : null // vlanSTag value specified for QINQ connections
+
+            # This is adding ctag for any connection that is QINQ Aside AND not COLO on Zside OR when COLO on Zside is not QINQ Encapsulation Type
+            vlan_c_tag = local.secondary_link_protocol_type == "QINQ" && (local.zside_ap_type != "COLO" || (local.zside_ap_type == "COLO" ? local.zside_link_protocol_type != "QINQ" : false)) ? var.secondary_vlan_ctag : null
+          }
+        }
+
+        //  TODO (ocobles) support FCR
+        # dynamic "router" {
+        #   for_each = var.cloud_router_id != "" ? [coalesce(var.cloud_router_secondary_id, var.cloud_router_id)] : []
+        #   content {
+        #     uuid = router.value
+        #   }
+        # }
+
+        dynamic "virtual_device" {
+          for_each = var.network_edge_id != "" ? [coalesce(var.network_edge_secondary_id, var.network_edge_id)] : []
+          content {
+            type = "EDGE"
+            uuid = virtual_device.value
+            // TODO (ocobles) allow use name instead of uuid
+            // name = var.network_edge_name
+          }
+        }
+
+        // Virtual device interface
+        dynamic "interface" {
+          for_each = var.network_edge_secondary_interface_id != 0 ? [var.network_edge_secondary_interface_id] : []
+          content {
+            type = "NETWORK"
+            id   = interface.value
+          }
+        }
+      }
+    }
+  }
+
+  z_side {
+    dynamic "service_token" {
+      for_each = var.secondary_zside_service_token_id != "" ? [var.secondary_zside_service_token_id] : []
+      content {
+        type = "VC_TOKEN"
+        uuid = service_token.value
+      }
+    }
+
+    dynamic "access_point" {
+      for_each = var.secondary_zside_service_token_id == "" ? [1] : []
+      content {
+        type = local.zside_ap_type
+        authentication_key = var.secondary_seller_authorization_key != "" ? var.secondary_seller_authorization_key : null
+        seller_region = var.secondary_seller_region != "" ? var.secondary_seller_region : local.primary_region
+
+        dynamic "profile" {
+          for_each = var.seller_profile_name != "" ? [1] : []
+          content {
+            type = data.equinix_fabric_service_profiles.sp[0].data[0].type
+            uuid = data.equinix_fabric_service_profiles.sp[0].data[0].uuid
+          }
+        }
+
+        dynamic "location" {
+          for_each = local.secondary_seller_metro_code != null ? [local.secondary_seller_metro_code] : []
+          content {
+            metro_code = location.value
+          }
+        }
+
+        //  TODO (ocobles) support Fabric Network
+        # dynamic "network" {
+        #   for_each = var.network_id != "" ? [var.network_id] : []
+        #   content {
+        #     uuid = network.value
+        #   }
+        # }
+
+        dynamic "port" {
+          for_each = var.zside_port_name != "" ? [data.equinix_fabric_ports.zside[0].data[0].uuid] : []
+          content {
+            uuid = port.value
+          }
+        }
+
+        dynamic "link_protocol" {
+          for_each = var.zside_port_name != "" ? [1] : []
+          content {
+            type       = local.zside_link_protocol_type == "UNTAGGEDEPL" ? "UNTAGGED" : local.zside_link_protocol_type
+            vlan_tag   = local.zside_link_protocol_type == "DOT1Q" ? var.zside_vlan_stag : null
+            vlan_s_tag = local.zside_link_protocol_type == "QINQ" ? var.zside_vlan_stag : null
+            vlan_c_tag = local.zside_link_protocol_type == "QINQ" && local.link_protocol_type != "QINQ" ? var.zside_vlan_ctag : null
+          }
+        }
+      }
     }
   }
 }

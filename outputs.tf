@@ -1,9 +1,9 @@
 output "primary_connection" {
   description = "Primary connection data."
-  value       = equinix_ecx_l2_connection.this
+  value       = equinix_fabric_connection.primary
 }
 
 output "secondary_connection" {
   description = "Secondary connection data."
-  value       = try(equinix_ecx_l2_connection.this.secondary_connection[0], null)
+  value       = try(equinix_fabric_connection.secondary, null)
 }
