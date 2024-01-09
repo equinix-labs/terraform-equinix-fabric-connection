@@ -1,3 +1,14 @@
+variable "connection_type" {
+  type        = string
+  description = <<EOF
+  Defines the connection type like EVPL_VC, EPL_VC, IP_VC, ACCESS_EPL_VC, IA_VC, EVPLAN_VC,
+  EPLAN_VC, IPWAN_VC. If not specified, it will be inferred based on access point types.
+  In cases where the type cannot be identified based on these parameters, the default value will
+  be 'EVPL_VC'.
+  EOF
+  default     = ""
+}
+
 variable "seller_profile_name" {
   type        = string
   description = <<EOF
@@ -19,7 +30,7 @@ variable "name" {
 variable "port_name" {
   type        = string
   description = <<EOF
-  Name of the buyer's port from which the connection would originate. One of 'port_name',
+  Name of the buyer's port from which the primary connection would originate. One of 'port_name',
   'network_edge_id' or 'service_token_id' is required.
   EOF
   default     = ""
@@ -36,14 +47,18 @@ variable "speed" {
 
 variable "speed_unit" {
   type        = string
-  description = "Unit of the speed/bandwidth to be allocated to the connection."
+  description = <<EOF
+  DEPRECATED and IGNORED: This variable is no longer used as speed is always assumed to be in MB
+  (megabytes). Specifying this variable will have no effect.
+  EOF
   default     = ""
 
   validation {
-    condition = (
-      var.speed_unit == "" ? true : contains(["GB", "MB"], var.speed_unit)
-    )
-    error_message = "Valid values are (MB, GB)."
+    condition     = var.speed_unit == ""
+    error_message = <<EOF
+    The 'speed_unit' variable is deprecated and should not be set. Please remove this variable
+    from your configuration.
+    EOF
   }
 }
 
@@ -94,11 +109,45 @@ variable "seller_region" {
 
 variable "notification_users" {
   type        = list(string)
-  description = "A list of email addresses used for sending connection update notifications."
+  description = <<EOF
+  A list of email addresses used to notify all connection configuration or status changes. One of
+  'notification_users' or 'notification_users_by_type' is required. This is equivalent to adding a
+  list to 'notification_users_by_type' with the key type ALL.
+  EOF
 
   validation {
     condition     = length(var.notification_users) > 0
     error_message = "Notification list cannot be empty."
+  }
+}
+
+variable "notification_users_by_type" {
+  type = map(list(string))
+
+  description = <<EOF
+  A map where each key represents a notification type (e.g., 'BANDWIDTH_ALERT', 'ALL') and the
+  value is a list of email addresses. This structure allows for the categorization of email
+  addresses based on the type of notification they should receive. One of
+  'notification_users_by_type' or 'notification_users' is required. Valid map keys are: ALL,
+  BANDWIDTH_ALERT, CONNECTION_APPROVAL, PROFILE_LIFECYCLE, SALES_REP_NOTIFICATIONS.
+  EOF
+  default     = {}
+
+  validation {
+    condition     = alltrue([
+      for k, _ in var.notification_users_by_type :
+      contains([
+        "ALL",
+        "BANDWIDTH_ALERT",
+        "CONNECTION_APPROVAL",
+        "PROFILE_LIFECYCLE",
+        "SALES_REP_NOTIFICATIONS"
+      ], k )
+    ])
+    error_message = <<EOF
+    Valid map keys are (ALL, BANDWIDTH_ALERT, CONNECTION_APPROVAL, PROFILE_LIFECYCLE,
+    SALES_REP_NOTIFICATIONS).
+    EOF
   }
 }
 
@@ -111,8 +160,8 @@ variable "purchase_order_number" {
 variable "vlan_stag" {
   type        = number
   description = <<EOF
-  S-Tag/Outer-Tag of the primary connection - a numeric character ranging from 2 - 4094. Required
-  if 'port_name' is specified.
+  VLAN S-Tag/Outer-Tag information for QINQ connections, or VLAN Tag information for DOT1Q.
+  Required if 'port_name' (A side). A numeric character ranging from 2 - 4094.
   EOF
   default     = 0
 }
@@ -120,8 +169,7 @@ variable "vlan_stag" {
 variable "vlan_ctag" {
   type        = number
   description = <<EOF
-  C-Tag/Inner-Tag of the primary connection - a numeric character ranging from
-  2 - 4094.
+  VLAN C-Tag/Inner-Tag information for QINQ connections. A numeric character ranging from 2 - 4094.
   EOF
   default     = 0
 }
@@ -140,8 +188,8 @@ variable "zside_port_name" {
 variable "zside_vlan_stag" {
   type        = number
   description = <<EOF
-  S-Tag/Outer-Tag of the connection on the Z side. Required if 'zside_port_name' is specified. A
-  numeric character ranging from 2 - 4094.
+  VLAN S-Tag/Outer-Tag information for QINQ connections, or VLAN Tag information for DOT1Q.
+  Required if 'zside_port_name' (Z side). A numeric character ranging from 2 - 4094.
   EOF
   default     = 0
 }
@@ -149,8 +197,7 @@ variable "zside_vlan_stag" {
 variable "zside_vlan_ctag" {
   type        = number
   description = <<EOF
-  C-Tag/Inner-Tag of the connection on the Z side. This is only applicable with 'named_tag'. A
-  numeric character ranging from 2 - 4094.
+  VLAN C-Tag/Inner-Tag information for QINQ connections. A numeric character ranging from 2 - 4094.
   EOF
   default     = 0
 }
@@ -171,7 +218,7 @@ variable "additional_info" {
     })
   )
   description = <<EOF
-  Additional parameters required for some service profiles. It should be a list of maps containing
+  Additional parameters required for some connections. It should be a list of maps containing
   'name' and 'value  e.g. `[{ name='asn' value = '65000'}, { name='ip' value = '192.168.0.1'}]`.
   EOF
   default     = []
@@ -258,24 +305,25 @@ variable "secondary_speed" {
 variable "secondary_speed_unit" {
   type        = string
   description = <<EOF
-  Unit of the speed/bandwidth to be allocated to the secondary connection. If not specified then
-  primary connection speed unit will be used.
+  DEPRECATED and IGNORED: This variable is no longer used as speed is always assumed to be in MB
+  (megabytes). Specifying this variable will have no effect.
   EOF
   default     = ""
 
   validation {
-    condition = (
-      var.secondary_speed_unit == "" ? true : contains(["GB", "MB"], var.secondary_speed_unit)
-    )
-    error_message = "Valid values are (MB, GB)."
+    condition     = var.secondary_speed_unit == ""
+    error_message = <<EOF
+    The 'secondary_speed_unit' variable is deprecated and should not be set. Please remove this
+    variable from your configuration.
+    EOF
   }
 }
 
 variable "secondary_vlan_stag" {
   type        = number
   description = <<EOF
-  S-Tag/Outer-Tag of the secondary connection. A numeric character ranging from 2 - 4094. Required
-  if 'secondary_port_name' is specified. 
+  VLAN S-Tag/Outer-Tag information for QINQ secondary connections, or VLAN Tag information for
+  DOT1Q. Required if 'secondary_port_name' (A side). A numeric character ranging from 2 - 4094.
   EOF
   default     = 0
 }
@@ -283,7 +331,7 @@ variable "secondary_vlan_stag" {
 variable "secondary_vlan_ctag" {
   type        = number
   description = <<EOF
-  C-Tag/Inner-Tag of the secondary connection - a numeric character ranging from
+  VLAN C-Tag/Inner-Tag information for QINQ secondary connections. A numeric character ranging from
   2 - 4094.
   EOF
   default     = 0
@@ -356,8 +404,43 @@ variable "secondary_service_token_id" {
   type        = string
   description = <<EOF
   Unique Equinix Fabric key shared with you by a provider that grants you authorization to use
-  their interconnection asset from (a-side) which the secondary connection would originate. Required if
-  'service_token_id' is specified, and 'redundancy_type' is 'REDUNDANT'.
+  their interconnection asset from (a-side) which the secondary connection would originate.
+  Required if 'service_token_id' is specified, and 'redundancy_type' is 'REDUNDANT'.
   EOF
   default     = ""
 }
+
+variable "secondary_zside_service_token_id" {
+  type        = string
+  description = <<EOF
+  Unique Equinix Fabric key shared with you by a provider that grants you authorization to use
+  their interconnection asset to (z-side) which the secondary connection would arrive.
+  EOF
+  default     = ""
+}
+
+// TODO (ocobles) add code below to support Fabric Network and FCR
+
+# variable "network_id" {
+#   type        = string
+#   description = "Unique identifier of a target Fabric Network."
+#   default     = ""
+# }
+
+# variable "cloud_router_id" {
+#   type        = string
+#   description = <<EOF
+#   Unique identifier of a Fabric Clour Router from which the connection would originate.
+#   EOF
+#   default     = ""
+# }
+
+# variable "cloud_router_secondary_id" {
+#   type        = string
+#   description = <<EOF
+#   Unique identifier of a Fabric Clour Router from which the connection would originate. If not
+#   specified, and 'cloud_router_id' is specified, and 'redundancy_type' is 'REDUNDANT' then primary
+#   Fabric Cloud Router will be used.
+#   EOF
+#   default     = ""
+# }
