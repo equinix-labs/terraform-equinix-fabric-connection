@@ -6,6 +6,10 @@ terraform {
       source  = "equinix/equinix"
       version = "~> 1.14"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.6.0"
+    }
   }
   provider_meta "equinix" {
     module_name = "equinix-fabric-connection"

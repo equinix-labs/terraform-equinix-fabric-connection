@@ -50,4 +50,4 @@ jobs:
           signoff: true
           delete-branch: true
 
-      # TODO(ocobleseqx): https://github.com/peter-evans/enable-pull-request-automerge
+      # TODO(ocobles): https://github.com/peter-evans/enable-pull-request-automerge

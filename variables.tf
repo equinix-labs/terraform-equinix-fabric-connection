@@ -45,6 +45,7 @@ variable "speed" {
   default     = 0
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "speed_unit" {
   type        = string
   description = <<EOF
@@ -134,7 +135,7 @@ variable "notification_users_by_type" {
   default     = {}
 
   validation {
-    condition     = alltrue([
+    condition = alltrue([
       for k, _ in var.notification_users_by_type :
       contains([
         "ALL",
@@ -142,7 +143,7 @@ variable "notification_users_by_type" {
         "CONNECTION_APPROVAL",
         "PROFILE_LIFECYCLE",
         "SALES_REP_NOTIFICATIONS"
-      ], k )
+      ], k)
     ])
     error_message = <<EOF
     Valid map keys are (ALL, BANDWIDTH_ALERT, CONNECTION_APPROVAL, PROFILE_LIFECYCLE,
@@ -302,6 +303,7 @@ variable "secondary_speed" {
   default     = 0
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "secondary_speed_unit" {
   type        = string
   description = <<EOF
@@ -419,7 +421,7 @@ variable "secondary_zside_service_token_id" {
   default     = ""
 }
 
-// TODO (ocobles) add code below to support Fabric Network and FCR
+# TODO (ocobles) add code below to support Fabric Network and FCR
 
 # variable "network_id" {
 #   type        = string
