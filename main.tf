@@ -4,7 +4,7 @@ data "equinix_fabric_service_profiles" "sp" {
   filter {
     property = "/name"
     operator = "="
-    values = [var.seller_profile_name]
+    values   = [var.seller_profile_name]
   }
 }
 
@@ -37,14 +37,14 @@ resource "random_string" "this" {
   special = false
 }
 
-resource "equinix_fabric_connection" "primary"{
+resource "equinix_fabric_connection" "primary" {
   name = var.redundancy_type == "REDUNDANT" && var.secondary_name == "" && var.name == "" ? format("%s-PRI", local.primary_name) : local.primary_name
   type = local.connection_type
 
   dynamic "notifications" {
     for_each = local.notification_users_by_type
     content {
-      type = notifications.key
+      type   = notifications.key
       emails = notifications.value
     }
   }
@@ -57,11 +57,11 @@ resource "equinix_fabric_connection" "primary"{
   bandwidth = local.bandwidth
 
   redundancy {
-    priority= "PRIMARY"
+    priority = "PRIMARY"
   }
 
   order {
-    purchase_order_number= var.purchase_order_number != "" ? var.purchase_order_number : null
+    purchase_order_number = var.purchase_order_number != "" ? var.purchase_order_number : null
   }
 
   a_side {
@@ -91,15 +91,15 @@ resource "equinix_fabric_connection" "primary"{
           for_each = var.port_name != "" ? [1] : []
           content {
             type       = local.link_protocol_type == "UNTAGGEDEPL" ? "UNTAGGED" : local.link_protocol_type
-            vlan_tag   = local.link_protocol_type == "DOT1Q" ? var.vlan_stag : null // vlanTag value specified for DOT1Q connections
-            vlan_s_tag = local.link_protocol_type == "QINQ" ? var.vlan_stag : null // vlanSTag value specified for QINQ connections
+            vlan_tag   = local.link_protocol_type == "DOT1Q" ? var.vlan_stag : null # vlanTag value specified for DOT1Q connections
+            vlan_s_tag = local.link_protocol_type == "QINQ" ? var.vlan_stag : null  # vlanSTag value specified for QINQ connections
 
             # This is adding ctag for any connection that is QINQ Aside AND not COLO on Zside OR when COLO on Zside is not QINQ Encapsulation Type
             vlan_c_tag = local.link_protocol_type == "QINQ" && (local.zside_ap_type != "COLO" || (local.zside_ap_type == "COLO" ? local.zside_link_protocol_type != "QINQ" : false)) ? var.vlan_ctag : null
           }
         }
 
-        //  TODO (ocobles) support FCR
+        #  TODO (ocobles) support FCR
         # dynamic "router" {
         #   for_each = var.cloud_router_id != "" ? [var.cloud_router_id] : []
         #   content {
@@ -112,12 +112,12 @@ resource "equinix_fabric_connection" "primary"{
           content {
             type = "EDGE"
             uuid = virtual_device.value
-            // TODO (ocobles) allow use name instead of uuid
-            // name = var.network_edge_name
+            # TODO (ocobles) allow use name instead of uuid
+            # name = var.network_edge_name
           }
         }
 
-        // Virtual device interface
+        # Virtual device interface
         dynamic "interface" {
           for_each = var.network_edge_interface_id != 0 ? [var.network_edge_interface_id] : []
           content {
@@ -141,9 +141,9 @@ resource "equinix_fabric_connection" "primary"{
     dynamic "access_point" {
       for_each = var.zside_service_token_id == "" ? [1] : []
       content {
-        type = local.zside_ap_type
+        type               = local.zside_ap_type
         authentication_key = var.seller_authorization_key != "" ? var.seller_authorization_key : null
-        seller_region = local.primary_region
+        seller_region      = local.primary_region
 
         dynamic "profile" {
           for_each = var.seller_profile_name != "" ? [1] : []
@@ -160,7 +160,7 @@ resource "equinix_fabric_connection" "primary"{
           }
         }
 
-        //  TODO (ocobles) support Fabric Network
+        # TODO (ocobles) support Fabric Network
         # dynamic "network" {
         #   for_each = var.network_id != "" ? [var.network_id] : []
         #   content {
@@ -190,7 +190,7 @@ resource "equinix_fabric_connection" "primary"{
 }
 
 # SECONDARY CONNECTION
-resource "equinix_fabric_connection" "secondary"{
+resource "equinix_fabric_connection" "secondary" {
   count = var.redundancy_type == "REDUNDANT" ? 1 : 0
 
   name = local.secondary_name
@@ -199,7 +199,7 @@ resource "equinix_fabric_connection" "secondary"{
   dynamic "notifications" {
     for_each = local.notification_users_by_type
     content {
-      type = notifications.key
+      type   = notifications.key
       emails = notifications.value
     }
   }
@@ -217,7 +217,7 @@ resource "equinix_fabric_connection" "secondary"{
   }
 
   order {
-    purchase_order_number= var.purchase_order_number != "" ? var.purchase_order_number : null
+    purchase_order_number = var.purchase_order_number != "" ? var.purchase_order_number : null
   }
 
   a_side {
@@ -247,15 +247,15 @@ resource "equinix_fabric_connection" "secondary"{
           for_each = var.port_name != "" ? [1] : []
           content {
             type       = local.secondary_link_protocol_type == "UNTAGGEDEPL" ? "UNTAGGED" : local.secondary_link_protocol_type
-            vlan_tag   = local.secondary_link_protocol_type == "DOT1Q" ? var.secondary_vlan_stag : null // vlanTag value specified for DOT1Q connections
-            vlan_s_tag = local.secondary_link_protocol_type == "QINQ" ? var.secondary_vlan_stag : null // vlanSTag value specified for QINQ connections
+            vlan_tag   = local.secondary_link_protocol_type == "DOT1Q" ? var.secondary_vlan_stag : null # vlanTag value specified for DOT1Q connections
+            vlan_s_tag = local.secondary_link_protocol_type == "QINQ" ? var.secondary_vlan_stag : null  # vlanSTag value specified for QINQ connections
 
             # This is adding ctag for any connection that is QINQ Aside AND not COLO on Zside OR when COLO on Zside is not QINQ Encapsulation Type
             vlan_c_tag = local.secondary_link_protocol_type == "QINQ" && (local.zside_ap_type != "COLO" || (local.zside_ap_type == "COLO" ? local.zside_link_protocol_type != "QINQ" : false)) ? var.secondary_vlan_ctag : null
           }
         }
 
-        //  TODO (ocobles) support FCR
+        # TODO (ocobles) support FCR
         # dynamic "router" {
         #   for_each = var.cloud_router_id != "" ? [coalesce(var.cloud_router_secondary_id, var.cloud_router_id)] : []
         #   content {
@@ -268,12 +268,12 @@ resource "equinix_fabric_connection" "secondary"{
           content {
             type = "EDGE"
             uuid = virtual_device.value
-            // TODO (ocobles) allow use name instead of uuid
-            // name = var.network_edge_name
+            # TODO (ocobles) allow use name instead of uuid
+            # name = var.network_edge_name
           }
         }
 
-        // Virtual device interface
+        # Virtual device interface
         dynamic "interface" {
           for_each = var.network_edge_secondary_interface_id != 0 ? [var.network_edge_secondary_interface_id] : []
           content {
@@ -297,9 +297,9 @@ resource "equinix_fabric_connection" "secondary"{
     dynamic "access_point" {
       for_each = var.secondary_zside_service_token_id == "" ? [1] : []
       content {
-        type = local.zside_ap_type
+        type               = local.zside_ap_type
         authentication_key = var.secondary_seller_authorization_key != "" ? var.secondary_seller_authorization_key : null
-        seller_region = var.secondary_seller_region != "" ? var.secondary_seller_region : local.primary_region
+        seller_region      = var.secondary_seller_region != "" ? var.secondary_seller_region : local.primary_region
 
         dynamic "profile" {
           for_each = var.seller_profile_name != "" ? [1] : []
@@ -316,7 +316,7 @@ resource "equinix_fabric_connection" "secondary"{
           }
         }
 
-        //  TODO (ocobles) support Fabric Network
+        # TODO (ocobles) support Fabric Network
         # dynamic "network" {
         #   for_each = var.network_id != "" ? [var.network_id] : []
         #   content {
